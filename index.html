@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Analyzer - SASTRA (PDF Supported)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #d1e7dd;
+            color: #0f5132;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            color: #333;
+            font-size: 22px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .input-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .input-group textarea {
+            width: 100%;
+            min-height: 300px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .file-upload-area {
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            background: #f8f9fa;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-upload-area:hover {
+            background: #e9ecef;
+            border-color: #5568d3;
+        }
+
+        .file-upload-area.dragover {
+            background: #e3f2fd;
+            border-color: #1976d2;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-label {
+            display: block;
+            padding: 15px;
+            cursor: pointer;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .file-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .file-info {
+            margin-top: 10px;
+            padding: 10px;
+            background: #e3f2fd;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #1976d2;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            margin-left: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-card .number {
+            font-size: 42px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .keyword-section {
+            margin-bottom: 30px;
+        }
+
+        .keyword-section h3 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .keyword-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .keyword {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .keyword-matched {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .keyword-missing {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .keyword-optional {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .progress-section {
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .suggestions {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .suggestions h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .suggestions ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .suggestions li {
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+            color: #666;
+        }
+
+        .suggestions li:last-child {
+            border-bottom: none;
+        }
+
+        .suggestions li:before {
+            content: "💡 ";
+            margin-right: 8px;
+        }
+
+        .category-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .category-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .export-btn {
+            margin-top: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .example-btn {
+            background: #e3f2fd;
+            color: #1976d2;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+
+        .example-btn:hover {
+            background: #bbdefb;
+        }
+
+        .score-indicator {
+            font-size: 18px;
+            font-weight: 600;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .score-excellent {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .score-good {
+            background: #cfe2ff;
+            color: #084298;
+        }
+
+        .score-fair {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .score-poor {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .processing-status {
+            margin-top: 10px;
+            padding: 10px;
+            background: #fff3cd;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #856404;
+            display: none;
+        }
+
+        .processing-status.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📄 Resume Analyzer</h1>
+            <p>Compare your resume against job descriptions and identify missing skills</p>
+            <span class="badge">✅ PDF Support Enabled</span>
+        </div>
+
+        <!-- Input Section -->
+        <div class="card" id="inputSection">
+            <h2>📝 Input Documents</h2>
+            <div class="input-section">
+                <!-- Resume Upload -->
+                <div class="input-group">
+                    <label for="resume">Student Resume</label>
+                    
+                    <div class="file-upload-area" id="resumeDropZone" onclick="document.getElementById('resumeFile').click()">
+                        <div class="file-icon">📄</div>
+                        <div class="file-label">
+                            <strong>Click to upload</strong> or drag and drop<br>
+                            <small>Supports: PDF, TXT, DOC, DOCX</small>
+                        </div>
+                        <input type="file" id="resumeFile" class="file-input" accept=".txt,.pdf,.doc,.docx">
+                    </div>
+                    <div id="resumeFileInfo" class="file-info hidden"></div>
+                    <div id="resumeProcessing" class="processing-status">⏳ Processing PDF...</div>
+                    
+                    <button class="example-btn" onclick="loadExampleResume()">📋 Load Example Resume</button>
+                    
+                    <textarea id="resume" placeholder="Or paste resume text here...
+
+Example:
+John Doe
+Computer Science Student
+Email: john@example.com
+
+EDUCATION
+Bachelor of Technology in Computer Science
+SASTRA University (2021-2025)
+CGPA: 8.5/10
+
+SKILLS
+- Programming: Python, Java, C++
+- Web Development: HTML, CSS, JavaScript, React
+- Database: MySQL, MongoDB
+- Tools: Git, VS Code
+
+PROJECTS
+1. E-commerce Website
+   - Built using React and Node.js
+   - Implemented payment gateway"></textarea>
+                </div>
+
+                <!-- Job Description Upload -->
+                <div class="input-group">
+                    <label for="jobDesc">Job Description</label>
+                    
+                    <div class="file-upload-area" id="jdDropZone" onclick="document.getElementById('jdFile').click()">
+                        <div class="file-icon">📋</div>
+                        <div class="file-label">
+                            <strong>Click to upload</strong> or drag and drop<br>
+                            <small>Supports: PDF, TXT, DOC, DOCX</small>
+                        </div>
+                        <input type="file" id="jdFile" class="file-input" accept=".txt,.pdf,.doc,.docx">
+                    </div>
+                    <div id="jdFileInfo" class="file-info hidden"></div>
+                    <div id="jdProcessing" class="processing-status">⏳ Processing PDF...</div>
+                    
+                    <button class="example-btn" onclick="loadExampleJD()">📋 Load Example Job Description</button>
+                    
+                    <textarea id="jobDesc" placeholder="Or paste job description here...
+
+Example:
+Full Stack Developer Position
+
+REQUIREMENTS:
+- 0-2 years experience
+- Strong knowledge of React.js and Node.js
+- Experience with MongoDB and SQL databases
+- Understanding of REST APIs
+- Knowledge of Git version control
+- Good problem-solving skills"></textarea>
+                </div>
+            </div>
+
+            <div style="text-align: center;">
+                <button class="btn btn-primary" id="analyzeBtn" onclick="analyzeResume()">
+                    🔍 Analyze Resume
+                </button>
+                <button class="btn btn-secondary" onclick="clearAll()">
+                    🗑️ Clear All
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div class="card loading hidden" id="loadingSection">
+            <div class="loading-spinner"></div>
+            <p>Analyzing your resume...</p>
+        </div>
+
+        <!-- Results Section (same as before) -->
+        <div class="results" id="resultsSection">
+            <!-- Overall Score -->
+            <div class="card">
+                <h2>📊 Overall Match Score</h2>
+                <div id="scoreIndicator" class="score-indicator"></div>
+                <div class="progress-section">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressBar"></div>
+                    </div>
+                    <p style="text-align: center; color: #666; font-size: 14px;" id="progressText"></p>
+                </div>
+            </div>
+
+            <!-- Statistics -->
+            <div class="card">
+                <h2>📈 Quick Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="number" id="matchedCount">0</div>
+                        <div class="label">Matched Skills</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number" id="missingCount">0</div>
+                        <div class="label">Missing Skills</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number" id="totalCount">0</div>
+                        <div class="label">Total Required</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number" id="matchPercent">0%</div>
+                        <div class="label">Match Percentage</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Keyword Analysis -->
+            <div class="card">
+                <h2>🔑 Keyword Analysis</h2>
+                
+                <div class="keyword-section">
+                    <h3>✅ Skills You Have (Matched)</h3>
+                    <div class="keyword-list" id="matchedKeywords"></div>
+                </div>
+
+                <div class="keyword-section">
+                    <h3>❌ Missing Skills (Required)</h3>
+                    <div class="keyword-list" id="missingKeywords"></div>
+                </div>
+
+                <div class="keyword-section">
+                    <h3>⭐ Optional Skills (Good to Have)</h3>
+                    <div class="keyword-list" id="optionalKeywords"></div>
+                </div>
+            </div>
+
+            <!-- Category-wise Analysis -->
+            <div class="card">
+                <h2>📚 Category-wise Analysis</h2>
+                <div id="categoryAnalysis"></div>
+            </div>
+
+            <!-- Suggestions -->
+            <div class="card">
+                <h2>💡 Recommendations</h2>
+                <div class="suggestions">
+                    <h3>How to Improve Your Resume:</h3>
+                    <ul id="suggestionsList"></ul>
+                </div>
+            </div>
+
+            <!-- Export Options -->
+            <div class="card">
+                <h2>💾 Export Results</h2>
+                <button class="btn btn-primary" onclick="exportToText()">📝 Download as Text</button>
+                <button class="btn btn-secondary" onclick="printResults()">🖨️ Print Report</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    
+    <script>
+        // Configure PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        // Common technical skills and keywords
+        const skillCategories = {
+            'Programming Languages': ['python', 'java', 'javascript', 'c++', 'c#', 'php', 'ruby', 'go', 'rust', 'kotlin', 'swift', 'typescript', 'c', 'r', 'matlab', 'scala'],
+            'Web Technologies': ['html', 'css', 'react', 'angular', 'vue', 'node.js', 'express', 'django', 'flask', 'spring', 'rest api', 'graphql', 'jquery', 'bootstrap', 'tailwind'],
+            'Databases': ['mysql', 'postgresql', 'mongodb', 'oracle', 'sql server', 'redis', 'cassandra', 'elasticsearch', 'firebase', 'dynamodb', 'sqlite'],
+            'Cloud & DevOps': ['aws', 'azure', 'gcp', 'docker', 'kubernetes', 'jenkins', 'ci/cd', 'terraform', 'ansible', 'linux', 'nginx', 'apache'],
+            'Tools & Frameworks': ['git', 'github', 'jira', 'agile', 'scrum', 'maven', 'gradle', 'webpack', 'babel', 'npm', 'yarn'],
+            'Mobile Development': ['android', 'ios', 'react native', 'flutter', 'swift', 'kotlin', 'xamarin'],
+            'Data Science & AI': ['machine learning', 'deep learning', 'tensorflow', 'pytorch', 'pandas', 'numpy', 'scikit-learn', 'nlp', 'data analysis', 'statistics'],
+            'Soft Skills': ['communication', 'teamwork', 'leadership', 'problem-solving', 'analytical', 'critical thinking', 'time management', 'presentation']
+        };
+
+        // PDF Text Extraction Function
+        async function extractTextFromPDF(file) {
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                let fullText = '';
+
+                // Extract text from each page
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    const pageText = textContent.items.map(item => item.str).join(' ');
+                    fullText += pageText + '\n';
+                }
+
+                return fullText;
+            } catch (error) {
+                console.error('Error extracting PDF:', error);
+                throw new Error('Failed to read PDF file. Please try a different file or paste the text manually.');
+            }
+        }
+
+        // Handle file upload for Resume
+        document.getElementById('resumeFile').addEventListener('change', async function(e) {
+            await handleFileUpload(e.target.files[0], 'resume');
+        });
+
+        // Handle file upload for JD
+        document.getElementById('jdFile').addEventListener('change', async function(e) {
+            await handleFileUpload(e.target.files[0], 'jobDesc');
+        });
+
+        // Drag and drop support
+        ['resumeDropZone', 'jdDropZone'].forEach(zoneId => {
+            const zone = document.getElementById(zoneId);
+            const fileInputId = zoneId === 'resumeDropZone' ? 'resumeFile' : 'jdFile';
+            
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                zone.classList.add('dragover');
+            });
+
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('dragover');
+            });
+
+            zone.addEventListener('drop', async (e) => {
+                e.preventDefault();
+                zone.classList.remove('dragover');
+                const file = e.dataTransfer.files[0];
+                if (file) {
+                    const targetId = zoneId === 'resumeDropZone' ? 'resume' : 'jobDesc';
+                    await handleFileUpload(file, targetId);
+                }
+            });
+        });
+
+        async function handleFileUpload(file, targetId) {
+            if (!file) return;
+
+            const fileInfoId = targetId === 'resume' ? 'resumeFileInfo' : 'jdFileInfo';
+            const processingId = targetId === 'resume' ? 'resumeProcessing' : 'jdProcessing';
+            const fileInfoEl = document.getElementById(fileInfoId);
+            const processingEl = document.getElementById(processingId);
+            const targetTextarea = document.getElementById(targetId);
+
+            // Show file info
+            fileInfoEl.textContent = `📎 ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+            fileInfoEl.classList.remove('hidden');
+
+            try {
+                let text = '';
+
+                if (file.type === 'application/pdf') {
+                    // Show processing indicator
+                    processingEl.classList.add('active');
+                    
+                    // Extract text from PDF
+                    text = await extractTextFromPDF(file);
+                    
+                    // Hide processing indicator
+                    processingEl.classList.remove('active');
+                    
+                    if (!text.trim()) {
+                        throw new Error('No text could be extracted from the PDF. It might be an image-based PDF.');
+                    }
+                } else {
+                    // For text files, read as text
+                    text = await file.text();
+                }
+
+                // Set the text in the textarea
+                targetTextarea.value = text;
+                
+                // Update file info to show success
+                fileInfoEl.innerHTML = `✅ ${file.name} - Successfully loaded!`;
+                fileInfoEl.style.background = '#d1e7dd';
+                fileInfoEl.style.color = '#0f5132';
+
+            } catch (error) {
+                console.error('Error reading file:', error);
+                fileInfoEl.innerHTML = `❌ Error: ${error.message}`;
+                fileInfoEl.style.background = '#f8d7da';
+                fileInfoEl.style.color = '#842029';
+                processingEl.classList.remove('active');
+                
+                alert(`Error reading file: ${error.message}\n\nPlease try:\n1. Paste the text manually\n2. Use a different file format\n3. Save PDF as text first`);
+            }
+        }
+
+        function loadExampleResume() {
+            document.getElementById('resume').value = `John Doe
+Computer Science Student
+Email: john.doe@example.com | Phone: +91 9876543210
+
+EDUCATION
+Bachelor of Technology in Computer Science
+SASTRA University (2021-2025)
+CGPA: 8.5/10
+
+TECHNICAL SKILLS
+Programming Languages: Python, Java, C++, JavaScript
+Web Development: HTML, CSS, React, Node.js
+Database: MySQL, MongoDB
+Tools: Git, VS Code, Jira
+Others: Data Structures, Algorithms, OOP
+
+PROJECTS
+1. E-commerce Website (2024)
+   - Built full-stack application using React and Node.js
+   - Implemented user authentication and payment gateway
+   - Used MongoDB for database management
+   
+2. Student Management System (2023)
+   - Developed using Java and MySQL
+   - Created REST APIs for data operations
+   
+INTERNSHIP EXPERIENCE
+Software Development Intern
+Tech Solutions Pvt Ltd (June 2024 - August 2024)
+- Developed features using React and JavaScript
+- Participated in agile development process
+- Worked with Git for version control
+- Collaborated with team of 5 developers
+
+CERTIFICATIONS
+- Python Programming - Coursera (2023)
+- Web Development Bootcamp - Udemy (2024)
+
+ACHIEVEMENTS
+- Winner of College Hackathon 2024
+- Published research paper on Machine Learning
+
+SOFT SKILLS
+Communication, Teamwork, Problem-solving, Time Management`;
+        }
+
+        function loadExampleJD() {
+            document.getElementById('jobDesc').value = `Full Stack Developer
+TechCorp India Pvt Ltd
+Location: Chennai | Experience: 0-2 years
+
+JOB DESCRIPTION:
+We are looking for a talented Full Stack Developer to join our growing team.
+
+REQUIRED SKILLS:
+- Strong proficiency in React.js and Node.js
+- Experience with MongoDB and SQL databases
+- Knowledge of REST API development
+- Understanding of Git version control
+- Good knowledge of HTML, CSS, and JavaScript
+- Familiarity with Agile/Scrum methodology
+- Strong problem-solving skills
+- Excellent communication skills
+
+PREFERRED SKILLS:
+- Experience with TypeScript
+- Knowledge of Docker and Kubernetes
+- Understanding of AWS cloud services
+- Experience with GraphQL
+- Knowledge of unit testing (Jest, Mocha)
+- Familiarity with CI/CD pipelines
+- Experience with Redux or state management
+- Understanding of microservices architecture
+
+RESPONSIBILITIES:
+- Develop and maintain web applications
+- Write clean, maintainable code
+- Collaborate with cross-functional teams
+- Participate in code reviews
+- Debug and troubleshoot issues
+- Follow best practices and coding standards
+- Contribute to technical documentation
+
+QUALIFICATIONS:
+- Bachelor's degree in Computer Science or related field
+- 0-2 years of development experience
+- Strong analytical and problem-solving abilities
+- Ability to work in a team environment`;
+        }
+
+        function analyzeResume() {
+            const resumeText = document.getElementById('resume').value.trim();
+            const jdText = document.getElementById('jobDesc').value.trim();
+
+            if (!resumeText || !jdText) {
+                alert('Please enter both resume and job description!');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('inputSection').style.display = 'none';
+            document.getElementById('loadingSection').classList.remove('hidden');
+
+            // Simulate processing time
+            setTimeout(() => {
+                performAnalysis(resumeText, jdText);
+                
+                // Hide loading, show results
+                document.getElementById('loadingSection').classList.add('hidden');
+                document.getElementById('resultsSection').classList.add('active');
+                
+                // Scroll to results
+                document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+            }, 1500);
+        }
+
+        function performAnalysis(resume, jd) {
+            const resumeLower = resume.toLowerCase();
+            const jdLower = jd.toLowerCase();
+
+            const jdKeywords = extractKeywords(jdLower);
+            const resumeKeywords = extractKeywords(resumeLower);
+
+            const matched = [];
+            const missing = [];
+            
+            jdKeywords.forEach(keyword => {
+                if (resumeKeywords.includes(keyword)) {
+                    matched.push(keyword);
+                } else {
+                    missing.push(keyword);
+                }
+            });
+
+            const matchPercent = jdKeywords.length > 0 ? Math.round((matched.length / jdKeywords.length) * 100) : 0;
+
+            document.getElementById('matchedCount').textContent = matched.length;
+            document.getElementById('missingCount').textContent = missing.length;
+            document.getElementById('totalCount').textContent = jdKeywords.length;
+            document.getElementById('matchPercent').textContent = matchPercent + '%';
+
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = matchPercent + '%';
+            progressBar.textContent = matchPercent + '%';
+
+            const scoreIndicator = document.getElementById('scoreIndicator');
+            let scoreText = '';
+            let scoreClass = '';
+            
+            if (matchPercent >= 80) {
+                scoreText = '🎉 Excellent Match! Your resume is well-aligned with this job.';
+                scoreClass = 'score-excellent';
+            } else if (matchPercent >= 60) {
+                scoreText = '👍 Good Match! Add a few more skills to improve.';
+                scoreClass = 'score-good';
+            } else if (matchPercent >= 40) {
+                scoreText = '⚠️ Fair Match. Consider adding missing skills.';
+                scoreClass = 'score-fair';
+            } else {
+                scoreText = '❌ Low Match. Significant skill gap identified.';
+                scoreClass = 'score-poor';
+            }
+            
+            scoreIndicator.textContent = scoreText;
+            scoreIndicator.className = 'score-indicator ' + scoreClass;
+
+            document.getElementById('progressText').textContent = 
+                `You have ${matched.length} out of ${jdKeywords.length} required skills`;
+
+            displayKeywords('matchedKeywords', matched, 'keyword-matched');
+            displayKeywords('missingKeywords', missing, 'keyword-missing');
+            
+            const optionalSkills = getOptionalSkills(jdLower, resumeLower);
+            displayKeywords('optionalKeywords', optionalSkills, 'keyword-optional');
+
+            displayCategoryAnalysis(matched, missing, resumeLower, jdLower);
+            generateSuggestions(missing, matchPercent);
+        }
+
+        function extractKeywords(text) {
+            const keywords = new Set();
+            
+            Object.values(skillCategories).flat().forEach(skill => {
+                if (text.includes(skill)) {
+                    keywords.add(skill);
+                }
+            });
+
+            const techTerms = [
+                'api', 'frontend', 'backend', 'full stack', 'responsive design',
+                'version control', 'testing', 'debugging', 'deployment',
+                'algorithms', 'data structures', 'oop', 'database design',
+                'authentication', 'authorization', 'security', 'performance',
+                'scalability', 'microservices'
+            ];
+
+            techTerms.forEach(term => {
+                if (text.includes(term)) {
+                    keywords.add(term);
+                }
+            });
+
+            return Array.from(keywords);
+        }
+
+        function getOptionalSkills(jd, resume) {
+            const optional = [];
+            const preferredKeywords = ['preferred', 'nice to have', 'bonus', 'plus', 'advantage'];
+            
+            const hasPreferred = preferredKeywords.some(keyword => jd.includes(keyword));
+            
+            if (hasPreferred) {
+                const allSkills = Object.values(skillCategories).flat();
+                allSkills.forEach(skill => {
+                    if (jd.includes(skill) && !resume.includes(skill)) {
+                        const skillIndex = jd.indexOf(skill);
+                        const preferredIndex = Math.max(...preferredKeywords.map(k => jd.lastIndexOf(k, skillIndex)));
+                        
+                        if (preferredIndex > 0 && preferredIndex < skillIndex) {
+                            optional.push(skill);
+                        }
+                    }
+                });
+            }
+
+            return optional;
+        }
+
+        function displayKeywords(elementId, keywords, className) {
+            const container = document.getElementById(elementId);
+            container.innerHTML = '';
+            
+            if (keywords.length === 0) {
+                container.innerHTML = '<span style="color: #999; font-style: italic;">None</span>';
+                return;
+            }
+
+            keywords.forEach(keyword => {
+                const span = document.createElement('span');
+                span.className = 'keyword ' + className;
+                span.textContent = keyword;
+                container.appendChild(span);
+            });
+        }
+
+        function displayCategoryAnalysis(matched, missing, resume, jd) {
+            const container = document.getElementById('categoryAnalysis');
+            container.innerHTML = '';
+
+            Object.entries(skillCategories).forEach(([category, skills]) => {
+                const categoryMatched = skills.filter(skill => matched.includes(skill));
+                const categoryMissing = skills.filter(skill => missing.includes(skill));
+                const categoryTotal = categoryMatched.length + categoryMissing.length;
+
+                if (categoryTotal > 0) {
+                    const div = document.createElement('div');
+                    div.className = 'category-section';
+                    
+                    const matchPercent = Math.round((categoryMatched.length / categoryTotal) * 100);
+                    
+                    div.innerHTML = `
+                        <div class="category-title">${category}</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${matchPercent}%">${matchPercent}%</div>
+                        </div>
+                        <p style="font-size: 14px; color: #666; margin-top: 8px;">
+                            ${categoryMatched.length} matched, ${categoryMissing.length} missing
+                        </p>
+                        ${categoryMissing.length > 0 ? `
+                            <p style="font-size: 13px; color: #842029; margin-top: 5px;">
+                                Missing: ${categoryMissing.join(', ')}
+                            </p>
+                        ` : ''}
+                    `;
+                    
+                    container.appendChild(div);
+                }
+            });
+        }
+
+        function generateSuggestions(missing, matchPercent) {
+            const list = document.getElementById('suggestionsList');
+            list.innerHTML = '';
+
+            const suggestions = [];
+
+            if (matchPercent < 50) {
+                suggestions.push('Your resume needs significant improvement to match this job description.');
+            }
+
+            if (missing.length > 0) {
+                suggestions.push(`Add these ${missing.length} missing skills to your resume: ${missing.slice(0, 5).join(', ')}${missing.length > 5 ? ', etc.' : ''}`);
+            }
+
+            Object.entries(skillCategories).forEach(([category, skills]) => {
+                const missingInCategory = skills.filter(skill => missing.includes(skill));
+                if (missingInCategory.length >= 3) {
+                    suggestions.push(`Consider taking courses in ${category} to learn: ${missingInCategory.slice(0, 3).join(', ')}`);
+                }
+            });
+
+            suggestions.push('Quantify your achievements with numbers and metrics');
+            suggestions.push('Add relevant projects that demonstrate the required skills');
+            suggestions.push('Update your resume to include keywords from the job description');
+            suggestions.push('Highlight your most relevant experience at the top');
+            
+            if (matchPercent >= 70) {
+                suggestions.push('Your resume is strong! Consider tailoring the language to match the JD more closely');
+            }
+
+            suggestions.forEach(suggestion => {
+                const li = document.createElement('li');
+                li.textContent = suggestion;
+                list.appendChild(li);
+            });
+        }
+
+        function clearAll() {
+            document.getElementById('resume').value = '';
+            document.getElementById('jobDesc').value = '';
+            document.getElementById('resumeFile').value = '';
+            document.getElementById('jdFile').value = '';
+            document.getElementById('resumeFileInfo').classList.add('hidden');
+            document.getElementById('jdFileInfo').classList.add('hidden');
+            document.getElementById('resultsSection').classList.remove('active');
+            document.getElementById('inputSection').style.display = 'block';
+        }
+
+        function exportToText() {
+            const matchPercent = document.getElementById('matchPercent').textContent;
+            const matched = document.getElementById('matchedCount').textContent;
+            const missing = document.getElementById('missingCount').textContent;
+
+            const text = `RESUME ANALYSIS REPORT
+Generated on: ${new Date().toLocaleString()}
+
+OVERALL MATCH SCORE: ${matchPercent}
+Matched Skills: ${matched}
+Missing Skills: ${missing}
+
+MATCHED KEYWORDS:
+${Array.from(document.getElementById('matchedKeywords').children).map(el => el.textContent).join(', ')}
+
+MISSING KEYWORDS:
+${Array.from(document.getElementById('missingKeywords').children).map(el => el.textContent).join(', ')}
+
+RECOMMENDATIONS:
+${Array.from(document.getElementById('suggestionsList').children).map((el, i) => `${i+1}. ${el.textContent}`).join('\n')}
+
+---
+Resume Analyzer by SASTRA University
+`;
+
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'resume-analysis-report.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function printResults() {
+            window.print();
+        }
+
+        // Print styles
+        const style = document.createElement('style');
+        style.textContent = `
+            @media print {
+                body { background: white; padding: 20px; }
+                .header, .card { box-shadow: none; page-break-inside: avoid; }
+                .btn, .file-label, .example-btn, #inputSection, .file-upload-area { display: none; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
